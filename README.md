@@ -1,0 +1,2 @@
+# AmoonGS
+适用于通过usb反向网络共享的android设备，使用moonlight作为额外屏幕，Gnirehtet作为网络手段
