@@ -1,0 +1,33 @@
+# 启动 Gnirehtet 并解锁手机
+startGnirehtetAndUnlock:
+  - command: "start gnirehtet.exe run" # 启动 gnirehtet (无需更改)
+    delay: 0
+  - command: "adb shell input keyevent POWER" # 模拟按下电源按键 (无需更改)
+    delay: 1000
+  - command: "adb shell input swipe 100 500 1000 500 300" # 模拟滑动解锁手机 (根据你的解锁方式进行修改 从XY到XY时间为Z)
+    delay: 1000
+  - command: "adb shell input keyevent 3" # 返回主屏幕 (无需更改)
+    delay: 1000
+  - command: "adb shell input tap 180 360" # 打开应用 (根据应用位置进行修改)
+    delay: 1000
+  - command: "adb shell input tap 265 175" # 其他操作 (模拟点击 XY)
+    delay: 5000
+  - command: "adb shell input tap 380 300" # 其他操作 (模拟点击 XY)
+    delay: 1000
+  - command: "adb shell input tap 310 360" # 其他操作 (模拟点击 XY)
+    delay: 1000
+
+# 停止 Gnirehtet 并锁屏
+stopGnirehtetAndLock:
+  - command: "adb shell input keyevent 3" # 返回主屏幕 (无需更改) 
+    delay: 0
+  - command: "adb shell input tap 700 775" # 其他操作 (模拟点击 XY) 
+    delay: 0
+  - command: "adb shell input tap 1200 400" # 其他操作 (模拟点击 XY) 
+    delay: 0
+  - command: "taskkill /f /im gnirehtet.exe" # 停止 gnirehtet (无需更改)
+    delay: 1000
+  - command: "adb shell input keyevent 3 && adb shell input keyevent 26" # 锁屏 (无需更改)
+    delay: 1000
+  - command: "exitApp" # 退出应用 (无需更改)
+    delay: 5000
