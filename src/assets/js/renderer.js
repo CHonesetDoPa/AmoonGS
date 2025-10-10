@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 function sendCommand(command) {
   window.api
     .sendCommand(command)
@@ -6,8 +7,8 @@ function sendCommand(command) {
     })
     .catch((error) => {
       console.error("Command execution failed:", error);
-      addLogEntry("log-output", `错误: ${error.message}`, true);
-      showErrorBox(`命令执行失败: ${error.message}`);
+      addLogEntry("log-output", `Error: ${error.message}`, true);
+      showErrorBox(`Command execution failed: ${error.message}`);
     });
 }
 
@@ -54,6 +55,7 @@ function showErrorBox(message) {
   errorBox.classList.remove("hidden");
 }
 
+/* eslint-disable no-unused-vars */
 function hideErrorBox() {
   const errorBox = document.getElementById("error-box");
   errorBox.classList.add("hidden");
@@ -66,3 +68,75 @@ window.api.onCommandResult((message) => {
     addLogEntry("log-output", message);
   }
 });
+
+/* eslint-disable no-unused-vars */
+async function getAdbDevices() {
+  try {
+    const devices = await window.api.getAdbDevices();
+    displayAdbDevices(devices);
+  } catch (error) {
+    console.error("Failed to get ADB devices:", error);
+    showErrorBox(`Failed to get ADB devices: ${error.message}`);
+  }
+}
+
+function displayAdbDevices(devices) {
+  const deviceSelect = document.getElementById("device-select");
+  if (!deviceSelect) return;
+
+  deviceSelect.innerHTML = "";
+
+  if (!Array.isArray(devices) || devices.length === 0) {
+    const option = document.createElement('option');
+    option.value = '';
+    option.textContent = 'No connected ADB devices detected';
+    deviceSelect.appendChild(option);
+    window._selectedDevice = null;
+    return;
+  }
+
+  // 添加默认选项
+  const defaultOption = document.createElement('option');
+  defaultOption.value = '';
+  defaultOption.textContent = 'Please select a device...';
+  deviceSelect.appendChild(defaultOption);
+
+  // 将设备数据保存在全局
+  window._adbDevices = devices.slice();
+
+  devices.forEach((device) => {
+    const statusText = device.status === "device" ? "online" : "offline";
+    const option = document.createElement('option');
+    option.value = device.id;
+    option.textContent = `${device.id} (${statusText})`;
+    option.dataset.status = device.status;
+    deviceSelect.appendChild(option);
+  });
+
+  // 自动选中第一个在线设备
+  const firstOnline = devices.find(d => d.status === 'device') || devices[0];
+  if (firstOnline) {
+    deviceSelect.value = firstOnline.id;
+    selectDeviceBySelect();
+  }
+}
+
+function selectDeviceBySelect() {
+  const deviceSelect = document.getElementById("device-select");
+  if (!deviceSelect) return;
+
+  const deviceId = deviceSelect.value;
+  const device = (window._adbDevices || []).find(d => d.id === deviceId) || null;
+  window._selectedDevice = device;
+}
+
+function showDeviceInfo() {
+  const d = window._selectedDevice;
+  if (!d) {
+    showErrorBox('Please select a device first');
+    return;
+  }
+
+  const statusText = d.status === 'device' ? 'online' : 'offline';
+  showErrorBox(`Device ${d.id} status: ${statusText}`);
+}
