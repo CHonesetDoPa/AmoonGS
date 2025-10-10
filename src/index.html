@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AmoonGS 控制面板</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    </style>
+</head>
+<body>
+    <!-- 背景装饰 -->
+    <div class="background-decoration"></div>
+    
+    <!-- 主容器 -->
+    <div class="main-container">
+        <!-- 头部 -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <i class="fas fa-rocket logo-icon"></i>
+                    <h1 class="app-title">AmoonGS</h1>
+                </div>
+                <div class="status-badge" id="status-badge">
+                    <i class="fas fa-circle status-icon"></i>
+                    <span>就绪</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- 控制面板 -->
+        <div class="control-panel">
+            <h2 class="section-title">
+                <i class="fas fa-gamepad"></i>
+                设备控制
+            </h2>
+            <div class="button-grid">
+                <button class="control-btn start-btn" onclick="executeScript('startGnirehtetAndUnlock')">
+                    <div class="btn-icon">
+                        <i class="fas fa-play"></i>
+                    </div>
+                    <div class="btn-content">
+                        <span class="btn-title">启动服务</span>
+                        <span class="btn-desc">启动 Gnirehtet 并解锁设备</span>
+                    </div>
+                </button>
+                <button class="control-btn stop-btn" onclick="executeScript('stopGnirehtetAndLock')">
+                    <div class="btn-icon">
+                        <i class="fas fa-stop"></i>
+                    </div>
+                    <div class="btn-content">
+                        <span class="btn-title">停止服务</span>
+                        <span class="btn-desc">关闭 Gnirehtet 并锁定设备</span>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <!-- 日志区域 -->
+        <div class="logs-section">
+            <div class="log-panel">
+                <div class="log-header">
+                    <h3 class="log-title">
+                        <i class="fas fa-network-wired"></i>
+                        Gnirehtet 日志
+                    </h3>
+                    <button class="clear-btn" onclick="clearLog('gnirehtet-log-output')">
+                        <i class="fas fa-broom"></i>
+                    </button>
+                </div>
+                <div class="log-content" id="gnirehtet-log-output">
+                    <div class="log-placeholder">
+                        <i class="fas fa-terminal"></i>
+                        <p>等待日志输出...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="log-panel">
+                <div class="log-header">
+                    <h3 class="log-title">
+                        <i class="fas fa-mobile-alt"></i>
+                        ADB 日志
+                    </h3>
+                    <button class="clear-btn" onclick="clearLog('log-output')">
+                        <i class="fas fa-broom"></i>
+                    </button>
+                </div>
+                <div class="log-content" id="log-output">
+                    <div class="log-placeholder">
+                        <i class="fas fa-terminal"></i>
+                        <p>等待日志输出...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 错误框 -->
+        <div id="error-box" class="error-box hidden">
+            <div class="error-content">
+                <span id="error-message">发生错误</span>
+                <button class="close-btn" onclick="hideErrorBox()">关闭</button>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <footer class="footer">
+            <p>
+                <i class="fas fa-code"></i>
+                Made with <i class="fas fa-heart"></i> by CH
+            </p>
+        </footer>
+    </div>
+
+    <script src="assets/js/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+    <script>
+        async function executeScript(scriptName) {
+            const statusBadge = document.getElementById('status-badge');
+            statusBadge.innerHTML = '<i class="fas fa-circle status-icon running"></i><span>运行中</span>';
+            
+            try {
+                const response = await fetch('script.yaml');
+                const yamlText = await response.text();
+                const scripts = jsyaml.load(yamlText);
+                const script = scripts[scriptName];
+
+                for (const step of script) {
+                    await sendCommandWithDelay(step.command, step.delay);
+                }
+                
+                statusBadge.innerHTML = '<i class="fas fa-circle status-icon"></i><span>就绪</span>';
+            } catch (error) {
+                statusBadge.innerHTML = '<i class="fas fa-circle status-icon error"></i><span>错误</span>';
+                console.error('Script execution failed:', error);
+                showErrorMessage('Script execution failed:', error);
+            }
+        }
+
+        function sendCommandWithDelay(command, delay) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    if (command === 'exitApp') {
+                        window.api.exitApp();
+                    } else {
+                        sendCommand(command);
+                    }
+                    resolve();
+                }, delay);
+            });
+        }
+
+        function clearLog(logId) {
+            const logElement = document.getElementById(logId);
+            logElement.innerHTML = '<div class="log-placeholder"><i class="fas fa-terminal"></i><p>日志已清空</p></div>';
+        }
+
+        function showErrorMessage(message) {
+            const errorBox = document.getElementById('error-box');
+            errorBox.classList.remove('hidden');
+            document.getElementById('error-message').textContent = message;
+        }
+
+        function hideErrorBox() {
+            const errorBox = document.getElementById('error-box');
+            errorBox.classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
