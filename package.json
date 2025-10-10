@@ -1,35 +1,30 @@
 {
   "name": "amoongs-gui",
-  "version": "1.0.0",
-  "description": "A GUI application built with Electron.",
-  "license": "MIT",
+  "version": "1.3.0",
+  "description": "Electron-based GUI for automating Gnirehtet network sharing and Moonlight streaming on Android devices.",
+  "license": "Unlicense",
   "author": "CH",
   "type": "commonjs",
   "main": "src/assets/js/index.js",
   "scripts": {
     "start": "electron .",
     "build": "electron-builder",
-    "build:win": "electron-builder --win",
-    "build:win64": "electron-builder --win --x64",
-    "build:win32": "electron-builder --win --ia32",
-    "build:portable": "electron-builder --win portable",
-    "build:dir": "electron-builder --win --dir",
-    "test": "npm run lint",
-    "lint": "eslint .",
+    "test": "eslint .",
     "clean": "rm -rf dist node_modules",
     "clean:dist": "rm -rf dist"
   },
   "dependencies": {
     "@material/web": "^2.4.0",
     "fs-extra": "^11.3.2",
-    "got": "^14.4.9",
+    "got": "^14.5.0",
     "jsonfile": "^6.2.0"
   },
   "devDependencies": {
     "electron": "^38.2.2",
     "electron-builder": "^26.0.12",
     "eslint": "^9.37.0",
-    "jest": "^30.2.0"
+    "jest": "^30.2.0",
+    "movelicense": "^1.3.1"
   },
   "build": {
     "appId": "com.amoongs.gui",
@@ -54,7 +49,10 @@
           ]
         }
       ],
-      "sign": false,
+      "extraResources": [
+        "gnirehtet.exe",
+        "gnirehtet.apk"
+      ],
       "signAndEditExecutable": false,
       "icon": "src/assets/images/icon-256.ico",
       "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
@@ -78,6 +76,7 @@
     },
     "portable": {
       "artifactName": "${productName}-${version}-portable.${ext}"
-    }
+    },
+    "afterPack": "./moveLicense.js"
   }
 }

@@ -1,4 +1,5 @@
 onlyBuiltDependencies:
   - electron
   - electron-winstaller
+  - movelicense
   - unrs-resolver
