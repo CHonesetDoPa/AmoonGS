@@ -7,7 +7,7 @@
   "type": "commonjs",
   "main": "src/assets/js/index.js",
   "scripts": {
-    "start": "node src/assets/js/index.js",
+    "start": "electron .",
     "build": "electron-builder",
     "build:win": "electron-builder --win",
     "build:win64": "electron-builder --win --x64",
