@@ -75,7 +75,6 @@
     },
     "portable": {
       "artifactName": "${productName}-${version}-portable.${ext}"
-    },
-    "afterPack": "./moveLicense.js"
+    }
   }
 }
